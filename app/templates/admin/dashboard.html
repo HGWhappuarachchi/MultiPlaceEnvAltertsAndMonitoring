@@ -1,0 +1,56 @@
+{% extends 'admin/layout.html' %}
+
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block content %}
+  <h2>System Overview</h2>
+
+  <!-- Stat Cards Section -->
+  <div class="stat-cards-container">
+    <div class="stat-card">
+      <h4>Total Users</h4>
+      <p>{{ user_count }}</p>
+    </div>
+    <div class="stat-card">
+      <h4>Total Devices</h4>
+      <p>{{ device_count }}</p>
+    </div>
+    <div class="stat-card online">
+      <h4>Online Devices</h4>
+      <p>{{ online_devices }}</p>
+    </div>
+    <div class="stat-card offline">
+      <h4>Offline Devices</h4>
+      <p>{{ offline_devices }}</p>
+    </div>
+  </div>
+
+  <!-- Recent Activity Section -->
+  <h3>Recent Activity (Latest 10 Alerts)</h3>
+  <div class="table-container">
+    <table class="user-table">
+      <thead>
+        <tr>
+          <th>Timestamp (UTC)</th>
+          <th>Device Name</th>
+          <th>Alert Type</th>
+          <th>Message</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for alert in recent_alerts %}
+          <tr>
+            <td>{{ alert.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+            <td>{{ alert.device.name }}</td>
+            <td>{{ alert.alert_type }}</td>
+            <td>{{ alert.message }}</td>
+          </tr>
+        {% else %}
+          <tr>
+            <td colspan="4">No recent alerts.</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% endblock %}

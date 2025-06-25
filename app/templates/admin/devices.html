@@ -1,0 +1,43 @@
+{% extends 'admin/layout.html' %}
+
+{% block title %}Device Management{% endblock %}
+
+{% block content %}
+  <div class="header-with-button">
+    <h2>Device Management</h2>
+    <a href="{{ url_for('admin.add_device') }}" class="button-primary">Add New Device</a>
+  </div>
+  
+  <table class="user-table">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Device Name</th>
+        <th>Unique Hardware ID</th>
+        <th>Category</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+  {% for device in devices %}
+    <tr>
+      <td>{{ device.id }}</td>
+      <td>{{ device.name }}</td>
+      <td>{{ device.unique_hardware_id }}</td>
+      <td>{{ device.category }}</td>
+      <td class="actions">
+        <a href="{{ url_for('admin.edit_device', device_id=device.id) }}" class="button-edit">Edit</a>
+        
+        <form method="post" action="{{ url_for('admin.delete_device', device_id=device.id) }}" style="display:inline;">
+          <button type="submit" class="button-delete" onclick="return confirm('Are you sure you want to delete this device? This may also delete its sensor data.');">Delete</button>
+        </form>
+      </td>
+    </tr>
+  {% else %}
+    <tr>
+      <td colspan="5">No devices found.</td>
+    </tr>
+  {% endfor %}
+</tbody>
+  </table>
+{% endblock %}

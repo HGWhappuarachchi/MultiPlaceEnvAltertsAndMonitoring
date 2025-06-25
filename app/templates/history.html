@@ -1,0 +1,198 @@
+{% extends 'layout.html' %}
+
+{% block title %}Historical Data{% endblock %}
+
+{% block head %}
+  {# This block allows us to add page-specific scripts or styles to the head #}
+  <!-- Include Chart.js and necessary plugins for advanced features -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-zoom/2.0.1/chartjs-plugin-zoom.min.js"></script>
+{% endblock %}
+
+{% block content %}
+  <h2>Historical Data</h2>
+
+  <!-- Date and Device Filter Form -->
+  <form method="get" class="date-filter-form">
+    <div class="form-group">
+      <label for="start_date">Start Date</label>
+      <input type="date" id="start_date" name="start_date" value="{{ start_date }}">
+    </div>
+    <div class="form-group">
+      <label for="end_date">End Date</label>
+      <input type="date" id="end_date" name="end_date" value="{{ end_date }}">
+    </div>
+    
+    <div class="form-group">
+        <label for="device_id">Device</label>
+        <select id="device_id" name="device_id">
+            <option value="all" {% if selected_device_id == 'all' or selected_device_id is none %}selected{% endif %}>All Assigned Devices</option>
+            {% for device in devices %}
+                {# We compare IDs as strings to avoid type issues with the request argument #}
+                <option value="{{ device.id }}" {% if selected_device_id|string == device.id|string %}selected{% endif %}>
+                    {{ device.name }}
+                </option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <button type="submit">Filter</button>
+  </form>
+
+  <!-- Chart Display -->
+  <div class="chart-container" style="height:50vh;">
+    <canvas id="sensorChart"></canvas>
+  </div>
+
+  <!-- Tabular Data Display -->
+  <h3>Raw Data</h3>
+  <div class="table-container">
+      <table class="user-table">
+        <thead>
+          <tr>
+            <th>Timestamp (UTC)</th>
+            <th>Device Name</th>
+            <th>Temperature (°C)</th>
+            <th>Humidity (%)</th>
+            <th>AC Voltage (V)</th>
+            <th>Water Detected</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in data %}
+            <tr>
+              <td>{{ item.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+              <td>{{ item.device.name }}</td>
+              <td>{{ '%.2f'|format(item.temperature) if item.temperature is not none }}</td>
+              <td>{{ '%.2f'|format(item.humidity) if item.humidity is not none }}</td>
+              <td>{{ '%.2f'|format(item.ac_voltage) if item.ac_voltage is not none }}</td>
+              <td>{{ 'Yes' if item.water_detected else 'No' }}</td>
+            </tr>
+          {% else %}
+            <tr>
+              <td colspan="6">No data found for the selected period.</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const ctx = document.getElementById('sensorChart');
+      const chartData = {{ chart_data|tojson }};
+      // Convert string labels to JavaScript Date objects for the time scale
+      const labels = chartData.labels.map(l => new Date(l + 'Z')); // Add 'Z' to indicate UTC
+
+      new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: labels,
+          datasets: [
+            {
+              label: 'Temperature (°C)',
+              data: chartData.temperatures,
+              borderColor: 'rgb(255, 99, 132)',
+              backgroundColor: 'rgba(255, 99, 132, 0.1)',
+              yAxisID: 'y_temp',
+              tension: 0.1,
+              borderWidth: 2,
+              pointRadius: 1,
+            },
+            {
+              label: 'Humidity (%)',
+              data: chartData.humidities,
+              borderColor: 'rgb(54, 162, 235)',
+              backgroundColor: 'rgba(54, 162, 235, 0.1)',
+              yAxisID: 'y_humidity',
+              tension: 0.1,
+              borderWidth: 2,
+              pointRadius: 1,
+            },
+            {
+              label: 'AC Voltage (V)',
+              data: chartData.ac_voltages,
+              borderColor: 'rgb(75, 192, 192)',
+              backgroundColor: 'rgba(75, 192, 192, 0.1)',
+              yAxisID: 'y_voltage',
+              tension: 0.1,
+              borderWidth: 2,
+              pointRadius: 1,
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: {
+            mode: 'index',
+            intersect: false,
+          },
+          plugins: {
+            title: {
+              display: true,
+              text: 'Historical Sensor Data (Scroll to Zoom, Drag to Pan)'
+            },
+            // --- ZOOM AND PAN CONFIGURATION ---
+            zoom: {
+              pan: {
+                enabled: true,
+                mode: 'x', // Pan along the X-axis
+              },
+              zoom: {
+                wheel: {
+                  enabled: true, // Enable zooming with the mouse wheel
+                },
+                pinch: {
+                  enabled: true // Enable zooming with pinch gesture on touch devices
+                },
+                mode: 'x', // Zoom along the X-axis
+              }
+            }
+          },
+          scales: {
+            x: {
+              type: 'time', // Use a time scale for the x-axis
+              time: {
+                unit: 'hour',
+                tooltipFormat: 'yyyy-MM-dd HH:mm:ss',
+                displayFormats: {
+                  hour: 'HH:mm',
+                  day: 'MMM dd',
+                }
+              },
+              title: {
+                display: true,
+                text: 'Timestamp'
+              }
+            },
+            y_temp: {
+              type: 'linear',
+              display: true,
+              position: 'left',
+              title: { display: true, text: 'Temperature (°C)' }
+            },
+            y_humidity: {
+              type: 'linear',
+              display: true,
+              position: 'right',
+              title: { display: true, text: 'Humidity (%)' },
+              grid: { drawOnChartArea: false }
+            },
+            y_voltage: {
+                type: 'linear',
+                display: true,
+                position: 'left',
+                // Offset this axis to prevent overlap with the temperature axis
+                offset: true, 
+                title: { display: true, text: 'AC Voltage (V)' },
+                grid: { drawOnChartArea: false }
+            }
+          }
+        }
+      });
+    });
+  </script>
+{% endblock %}

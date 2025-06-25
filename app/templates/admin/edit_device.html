@@ -1,0 +1,50 @@
+{% extends 'admin/layout.html' %}
+
+{% block title %}Edit Device{% endblock %}
+
+{% block content %}
+  <h2>Edit Device: {{ device.name }}</h2>
+
+  <form method="post">
+    <div class="form-group">
+      <label for="name">Device Name</label>
+      <input type="text" id="name" name="name" value="{{ device.name }}" required>
+    </div>
+    <div class="form-group">
+      <label for="unique_hardware_id">Unique Hardware ID</label>
+      <input type="text" id="unique_hardware_id" name="unique_hardware_id" value="{{ device.unique_hardware_id }}" required>
+    </div>
+    <div class="form-group">
+      <label for="category">Category</label>
+      <input type="text" id="category" name="category" value="{{ device.category or '' }}">
+    </div>
+    <hr>
+    <h4>Alert Thresholds</h4>
+    <div class="form-group">
+      <label for="temp_threshold_high">High Temperature Alert Threshold (°C)</label>
+      <input type="number" step="0.1" id="temp_threshold_high" name="temp_threshold_high" value="{{ device.temp_threshold_high or '' }}" placeholder="e.g., 28.5">
+    </div>
+    <div class="form-group">
+      <label for="humidity_threshold_low">Low Humidity Alert Threshold (%)</label>
+      <input type="number" step="0.1" id="humidity_threshold_low" name="humidity_threshold_low" value="{{ device.humidity_threshold_low or '' }}" placeholder="e.g., 30.0">
+    </div>
+    <div class="form-group">
+      <label for="humidity_threshold_high">High Humidity Alert Threshold (%)</label>
+      <input type="number" step="0.1" id="humidity_threshold_high" name="humidity_threshold_high" value="{{ device.humidity_threshold_high or '' }}" placeholder="e.g., 60.0">
+    </div>
+    <!-- VOLTAGE FIELDS ADDED -->
+    <div class="form-group">
+      <label for="voltage_threshold_low">Low AC Voltage Alert Threshold (V)</label>
+      <input type="number" step="0.1" id="voltage_threshold_low" name="voltage_threshold_low" value="{{ device.voltage_threshold_low or '' }}" placeholder="e.g., 220.0">
+    </div>
+    <div class="form-group">
+      <label for="voltage_threshold_high">High AC Voltage Alert Threshold (V)</label>
+      <input type="number" step="0.1" id="voltage_threshold_high" name="voltage_threshold_high" value="{{ device.voltage_threshold_high or '' }}" placeholder="e.g., 240.0">
+    </div>
+    <div class="form-group checkbox-item">
+      <input type="checkbox" id="alert_on_water" name="alert_on_water" {% if device.alert_on_water %}checked{% endif %}>
+      <label for="alert_on_water">Enable Water Leak Alerts</label>
+    </div>
+    <button type="submit">Update Device</button>
+  </form>
+{% endblock %}

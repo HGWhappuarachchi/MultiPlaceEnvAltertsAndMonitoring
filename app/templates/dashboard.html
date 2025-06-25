@@ -1,0 +1,40 @@
+{% extends 'layout.html' %}
+
+{% block title %}Live Dashboard{% endblock %}
+
+{% block content %}
+  <h2>Live Sensor Dashboard</h2>
+  <p>Last updated: {{ last_updated }} (UTC)</p>
+  
+  {% if items %}
+    <div class="cards-container">
+      {% for item in items %}
+        {# --- Determine the status class for the card --- #}
+        {% set status_class = 'status-ok' %}
+        {% if item.device.temp_alert_status or item.device.humidity_alert_status or item.device.water_alert_status %}
+          {% set status_class = 'status-alert' %}
+        {% endif %}
+
+        {# --- Apply the status class to the card div --- #}
+        <div class="card {{ status_class }}">
+          <h3>{{ item.device.name }}</h3>
+          <p><strong>Device ID:</strong> {{ item.device.unique_hardware_id }}</p>
+          <hr>
+          <p class="sensor-reading temp">Temperature: <span>{{ '%.2f'|format(item.log.temperature) }} °C</span></p>
+          <p class="sensor-reading humidity">Humidity: <span>{{ '%.2f'|format(item.log.humidity) }} %</span></p>
+          <p class="sensor-reading voltage">AC Voltage: <span>{{ '%.2f'|format(item.log.ac_voltage) }} V</span></p>
+          <p class="sensor-reading water">Water Detected: 
+            {% if item.log.water_detected %}
+              <span class="alert">YES</span>
+            {% else %}
+              <span>NO</span>
+            {% endif %}
+          </p>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p>No sensor data available yet for your assigned devices.</p>
+  {% endif %}
+
+{% endblock %}

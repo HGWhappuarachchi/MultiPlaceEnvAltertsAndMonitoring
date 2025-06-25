@@ -1,0 +1,33 @@
+{% extends 'admin/layout.html' %}
+
+{% block title %}System Alerts Log{% endblock %}
+
+{% block content %}
+  <h2>System-Wide Alerts Log</h2>
+  <p>Showing all alerts from all devices, newest first.</p>
+  
+  <table class="user-table">
+    <thead>
+      <tr>
+        <th>Timestamp (UTC)</th>
+        <th>Device Name</th>
+        <th>Alert Type</th>
+        <th>Message</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for alert in alerts %}
+        <tr>
+          <td>{{ alert.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+          <td>{{ alert.device.name }}</td>
+          <td>{{ alert.alert_type }}</td>
+          <td>{{ alert.message }}</td>
+        </tr>
+      {% else %}
+        <tr>
+          <td colspan="4">No alerts have been recorded in the system yet.</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endblock %}

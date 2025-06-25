@@ -1,0 +1,51 @@
+{% extends 'admin/layout.html' %}
+
+{% block title %}Edit User{% endblock %}
+
+{% block content %}
+  <h2>Edit User: {{ user.full_name }}</h2>
+
+  <form method="post">
+    <div class="form-group">
+      <label for="full_name">Full Name</label>
+      <input type="text" id="full_name" name="full_name" value="{{ user.full_name }}" required>
+    </div>
+    <div class="form-group">
+      <label for="email">Email Address</label>
+      <input type="email" id="email" name="email" value="{{ user.email }}" required>
+    </div>
+    <div class="form-group">
+      <label for="phone_number">Phone Number</label>
+      <input type="text" id="phone_number" name="phone_number" value="{{ user.phone_number or '' }}">
+    </div>
+    <div class="form-group">
+      <label for="role">Role</label>
+      <select id="role" name="role">
+        <option value="user" {% if user.role == 'user' %}selected{% endif %}>User</option>
+        <option value="admin" {% if user.role == 'admin' %}selected{% endif %}>Admin</option>
+      </select>
+    </div>
+    <div class="form-group">
+        <label for="password">New Password (optional)</label>
+        <input type="password" id="password" name="password" placeholder="Leave blank to keep current password">
+    </div>
+    <hr>
+    
+    <div class="form-group">
+      <label>Assign Devices</label>
+      <div class="checkbox-group">
+        {% for device in devices %}
+          <div class="checkbox-item">
+            <input type="checkbox" id="device-{{ device.id }}" name="devices" value="{{ device.id }}" 
+                   {% if device in user.devices.all() %}checked{% endif %}>
+            <label for="device-{{ device.id }}">{{ device.name }} (ID: {{ device.unique_hardware_id }})</label>
+          </div>
+        {% else %}
+          <p>No devices available to assign.</p>
+        {% endfor %}
+      </div>
+    </div>
+    
+    <button type="submit">Update User</button>
+  </form>
+{% endblock %}

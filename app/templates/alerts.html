@@ -1,0 +1,33 @@
+{% extends 'layout.html' %}
+
+{% block title %}Alert History{% endblock %}
+
+{% block content %}
+  <h2>Alert History</h2>
+  <p>Showing recent alerts for your assigned devices.</p>
+  
+  <table class="user-table">
+    <thead>
+      <tr>
+        <th>Timestamp (UTC)</th>
+        <th>Device Name</th>
+        <th>Alert Type</th>
+        <th>Message</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for alert in alerts %}
+        <tr>
+          <td>{{ alert.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+          <td>{{ alert.device.name }}</td>
+          <td>{{ alert.alert_type }}</td>
+          <td>{{ alert.message }}</td>
+        </tr>
+      {% else %}
+        <tr>
+          <td colspan="4">No alerts found for your devices.</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endblock %}

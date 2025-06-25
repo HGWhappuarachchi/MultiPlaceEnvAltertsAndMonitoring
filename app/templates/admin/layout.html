@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>{% block title %}Admin Panel{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  </head>
+  <body>
+    <main>
+      <nav>
+  <h1>Admin - Server Room Monitoring System</h1>
+  <div class="nav-links">
+    <a href="{{ url_for('admin.dashboard') }}">Admin Dashboard</a>
+    <a href="{{ url_for('admin.users') }}">Manage Users</a>
+    <a href="{{ url_for('admin.devices') }}">Manage Devices</a>
+    <a href="{{ url_for('admin.alerts') }}">System Alerts</a> 
+    <a href="{{ url_for('main.dashboard') }}">Main Dashboard</a>
+    <a href="{{ url_for('auth.logout') }}">Logout</a>
+  </div>
+</nav>
+      {% block content %}{% endblock %}
+    </main>
+  </body>
+</html>
