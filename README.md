@@ -76,6 +76,10 @@ environmental_monitoring/
    set MAIL_PASSWORD=your_password
    set MAIL_DEFAULT_SENDER=alerts@yourdomain.com
    ```
+**Admin**: admin@example.com
+***password***: adminpass
+**User**:  user@example.com
+***passowrd***: userpass
 
 5. **Initialize the database:**
    ```sh
