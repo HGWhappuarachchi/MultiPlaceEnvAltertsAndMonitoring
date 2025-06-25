@@ -48,35 +48,35 @@
 
   <!-- Tabular Data Display -->
   <h3>Raw Data</h3>
-  <div class="table-container">
-      <table class="user-table">
-        <thead>
+  <div class="table-container" style="max-height: 400px; overflow-y: auto;">
+    <table class="user-table" style="min-width: 800px;">
+      <thead>
+        <tr>
+          <th>Timestamp (UTC)</th>
+          <th>Device Name</th>
+          <th>Temperature (°C)</th>
+          <th>Humidity (%)</th>
+          <th>AC Voltage (V)</th>
+          <th>Water Detected</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in data %}
           <tr>
-            <th>Timestamp (UTC)</th>
-            <th>Device Name</th>
-            <th>Temperature (°C)</th>
-            <th>Humidity (%)</th>
-            <th>AC Voltage (V)</th>
-            <th>Water Detected</th>
+            <td>{{ item.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+            <td>{{ item.device.name }}</td>
+            <td>{{ '%.2f'|format(item.temperature) if item.temperature is not none }}</td>
+            <td>{{ '%.2f'|format(item.humidity) if item.humidity is not none }}</td>
+            <td>{{ '%.2f'|format(item.ac_voltage) if item.ac_voltage is not none }}</td>
+            <td>{{ 'Yes' if item.water_detected else 'No' }}</td>
           </tr>
-        </thead>
-        <tbody>
-          {% for item in data %}
-            <tr>
-              <td>{{ item.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</td>
-              <td>{{ item.device.name }}</td>
-              <td>{{ '%.2f'|format(item.temperature) if item.temperature is not none }}</td>
-              <td>{{ '%.2f'|format(item.humidity) if item.humidity is not none }}</td>
-              <td>{{ '%.2f'|format(item.ac_voltage) if item.ac_voltage is not none }}</td>
-              <td>{{ 'Yes' if item.water_detected else 'No' }}</td>
-            </tr>
-          {% else %}
-            <tr>
-              <td colspan="6">No data found for the selected period.</td>
-            </tr>
-          {% endfor %}
-        </tbody>
-      </table>
+        {% else %}
+          <tr>
+            <td colspan="6">No data found for the selected period.</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
   </div>
 
   <script>
